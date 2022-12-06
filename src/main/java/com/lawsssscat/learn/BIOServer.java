@@ -20,15 +20,17 @@ public class BIOServer {
 			@Override
 			public void run() {
 				BIOServerHandlerThreadPool threadPool = new BIOServerHandlerThreadPool(6, 10);
+				int count = 0;
 				while (true) {
+					count ++;
 					try {
-						System.out.println("===服务端监听===");
+						System.out.println("===服务端监听==="+count);
 						Socket socket = serverSocket.accept(); // 一个连接，只能处理一个客户端请求
-						System.out.println("===服务端连接===");
+						System.out.println("===服务端连接==="+count);
 						BIOServerHandlerRunnable command = new BIOServerHandlerRunnable(socket, callback);
 						threadPool.execute(command);
-						System.out.println("===服务端交付===");
-					} catch (IOException e) {
+						System.out.println("===服务端交付===" + count);
+					} catch (Throwable e) {
 						e.printStackTrace();
 					}
 				}

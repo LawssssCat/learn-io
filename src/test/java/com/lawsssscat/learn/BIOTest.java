@@ -34,7 +34,7 @@ public class BIOTest {
 				assertTrue(receiveMsg.indexOf(msg) >= 0);
 			}
 		});
-		Integer num = 10;
+		Integer num = 16;
 		BIOClient client = new BIOClient();
 		for (int i = 0; i < num; i++) {
 			Thread thread = new Thread(new Runnable() {
