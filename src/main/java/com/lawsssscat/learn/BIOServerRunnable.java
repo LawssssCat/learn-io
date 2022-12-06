@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class BIOServerThread extends Thread {
+public class BIOServerRunnable implements Runnable {
 
 	private Socket socket;
 	private Callback callback;
 
-	public BIOServerThread(Socket socket, Callback callback) {
+	public BIOServerRunnable(Socket socket, Callback callback) {
 		this.socket = socket;
 		this.callback = callback;
 	}

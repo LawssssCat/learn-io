@@ -19,13 +19,14 @@ public class BIOServer {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				BIOServerHandlerThreadPool threadPool = new BIOServerHandlerThreadPool(6, 10);
 				while (true) {
 					try {
 						System.out.println("===服务端监听===");
 						Socket socket = serverSocket.accept(); // 一个连接，只能处理一个客户端请求
 						System.out.println("===服务端连接===");
-						BIOServerThread serverThread = new BIOServerThread(socket, callback);
-						serverThread.start();
+						BIOServerRunnable command = new BIOServerRunnable(socket, callback);
+						threadPool.execute(command);
 						System.out.println("===服务端交付===");
 					} catch (IOException e) {
 						e.printStackTrace();
