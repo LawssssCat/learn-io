@@ -1,9 +1,6 @@
 package com.lawsssscat.learn;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -27,12 +24,9 @@ public class BIOServer {
 						System.out.println("===服务端监听===");
 						Socket socket = serverSocket.accept(); // 一个连接，只能处理一个客户端请求
 						System.out.println("===服务端连接===");
-						InputStream is = socket.getInputStream();
-						BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-						String msg = null;
-						if ((msg = reader.readLine()) != null) {
-							callback.run(msg, socket);
-						}
+						BIOServerThread serverThread = new BIOServerThread(socket, callback);
+						serverThread.start();
+						System.out.println("===服务端交付===");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

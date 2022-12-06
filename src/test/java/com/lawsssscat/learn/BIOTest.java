@@ -19,17 +19,19 @@ public class BIOTest {
 		new BIOServer().start(port, new Callback() {
 			@Override
 			public void run(Object... args) {
-				String receiveMsg = (String) args[0];
-				Socket socket = (Socket) args[1];
-				System.out.println(String.format("%s: %s", socket, receiveMsg));
-				assertTrue(receiveMsg.indexOf(msg) >= 0);
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				count++;
+				String receiveMsg = (String) args[0];
+				Socket socket = (Socket) args[1];
+				synchronized (count) {
+					count++;
+					System.out.println(String.format("%s: %s [%s]", socket, receiveMsg, count));
+				}
+				assertTrue(receiveMsg.indexOf(msg) >= 0);
 			}
 		});
 		Integer num = 10;
@@ -51,7 +53,9 @@ public class BIOTest {
 			thread.start();
 		}
 		Thread.sleep(1000);
-		assertEquals(num, count);
+		synchronized (count) {
+			assertEquals(num, count);
+		}
 	}
 
 }
