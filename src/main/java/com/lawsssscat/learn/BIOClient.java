@@ -24,6 +24,7 @@ public class BIOClient {
 		// 否则服务端报错java.net.SocketException: Connection reset
 		ps.println(msg);
 		ps.flush();
+		socket.close();
 	}
 
 }

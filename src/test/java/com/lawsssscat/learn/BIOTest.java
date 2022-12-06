@@ -15,7 +15,7 @@ public class BIOTest {
 	@Test
 	public void testSingleLine() throws IOException, InterruptedException {
 		int port = 9999;
-		String msg = "hello world! 服务器端，你好呀！";
+		String msg = "hello \nworld! 服务器端，你好呀！";
 		new BIOServer().start(port, new Callback() {
 			@Override
 			public void run(Object... args) {

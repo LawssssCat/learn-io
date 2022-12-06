@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class BIOServerRunnable implements Runnable {
+public class BIOServerHandlerRunnable implements Runnable {
 
 	private Socket socket;
 	private Callback callback;
 
-	public BIOServerRunnable(Socket socket, Callback callback) {
+	public BIOServerHandlerRunnable(Socket socket, Callback callback) {
 		this.socket = socket;
 		this.callback = callback;
 	}
@@ -22,10 +22,15 @@ public class BIOServerRunnable implements Runnable {
 		try {
 			is = socket.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-			String msg = null;
-			if ((msg = reader.readLine()) != null) {
-				callback.run(msg, socket);
+			StringBuilder sb = new StringBuilder();
+			String temp = null;
+			while ((temp = reader.readLine()) != null) {
+				sb.append(temp).append("\n");
 			}
+			if (sb.length() > 0) {
+				sb.deleteCharAt(sb.length() - 1);
+			}
+			callback.run(sb.toString(), socket);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

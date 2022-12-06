@@ -25,7 +25,7 @@ public class BIOServer {
 						System.out.println("===服务端监听===");
 						Socket socket = serverSocket.accept(); // 一个连接，只能处理一个客户端请求
 						System.out.println("===服务端连接===");
-						BIOServerRunnable command = new BIOServerRunnable(socket, callback);
+						BIOServerHandlerRunnable command = new BIOServerHandlerRunnable(socket, callback);
 						threadPool.execute(command);
 						System.out.println("===服务端交付===");
 					} catch (IOException e) {
