@@ -16,7 +16,7 @@ import java.net.Socket;
  */
 public class BIOServer {
 
-	public void start(int port, ServerCallback callback) throws IOException {
+	public void start(int port, Callback callback) throws IOException {
 		ServerSocket serverSocket = new ServerSocket(port);
 		System.out.println("===服务端启动===");
 		Thread thread = new Thread(new Runnable() {
@@ -24,12 +24,14 @@ public class BIOServer {
 			public void run() {
 				while (true) {
 					try {
-						Socket socket = serverSocket.accept();
+						System.out.println("===服务端监听===");
+						Socket socket = serverSocket.accept(); // 一个连接，只能处理一个客户端请求
+						System.out.println("===服务端连接===");
 						InputStream is = socket.getInputStream();
 						BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 						String msg = null;
 						if ((msg = reader.readLine()) != null) {
-							callback.run(msg);
+							callback.run(msg, socket);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
