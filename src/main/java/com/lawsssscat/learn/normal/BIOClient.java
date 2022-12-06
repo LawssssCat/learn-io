@@ -1,4 +1,4 @@
-package com.lawsssscat.learn;
+package com.lawsssscat.learn.normal;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -1,8 +1,10 @@
-package com.lawsssscat.learn;
+package com.lawsssscat.learn.normal;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import com.lawsssscat.learn.Callback;
 
 /**
  *

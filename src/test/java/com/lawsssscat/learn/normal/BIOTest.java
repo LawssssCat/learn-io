@@ -1,4 +1,4 @@
-package com.lawsssscat.learn;
+package com.lawsssscat.learn.normal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.junit.Test;
+
+import com.lawsssscat.learn.Callback;
+import com.lawsssscat.learn.normal.BIOClient;
+import com.lawsssscat.learn.normal.BIOServer;
 
 public class BIOTest {
 

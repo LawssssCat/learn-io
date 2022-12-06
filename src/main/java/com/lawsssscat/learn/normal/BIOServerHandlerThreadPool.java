@@ -1,4 +1,4 @@
-package com.lawsssscat.learn;
+package com.lawsssscat.learn.normal;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
