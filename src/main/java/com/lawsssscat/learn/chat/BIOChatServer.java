@@ -27,6 +27,7 @@ public class BIOChatServer {
 
 	public void start() throws IOException {
 		ServerSocket serverSocket = new ServerSocket(port);
+		BIOServerHandlerThreadPool threadPool = new BIOServerHandlerThreadPool(3, 6);
 		logger.info("start...");
 		Thread thread = new Thread(new Runnable() {
 			@Override
@@ -38,9 +39,7 @@ public class BIOChatServer {
 						logger.info("waiting...");
 						Socket socket = serverSocket.accept();
 						logger.info("accept!");
-						Thread thread = new Thread(new BIOChatServerHandlerRunnable(socket));
-						thread.setName("thread-server[" + count + "]");
-						thread.start();
+						threadPool.execute(new BIOChatServerHandlerRunnable(socket));
 						logger.info("deploy~");
 					} catch (IOException e) {
 						e.printStackTrace();
