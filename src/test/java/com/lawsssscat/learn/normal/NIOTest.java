@@ -1,6 +1,7 @@
 package com.lawsssscat.learn.normal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import org.junit.Test;
 
@@ -20,6 +22,9 @@ public class NIOTest {
 
 	private static final Logger logger = Logger.get(NIOTest.class);
 
+	/**
+	 * buffer 常用方法
+	 */
 	@Test
 	public void testBuffer() {
 		// 容量1024byte
@@ -125,5 +130,40 @@ public class NIOTest {
 		}
 
 		assertEquals(except, actual);
+	}
+
+	/**
+	 * Channel复制数据
+	 */
+	@Test
+	public void testChannelCopy() {
+		File srcFile = new File(projectPath + "/src/test/java/" + NIOTest.class.getName().replaceAll("\\.", "/") + ".java");
+		File dstFile = new File(projectPath + "/target/channelCopyTest-" + UUID.randomUUID().toString() + ".java");
+
+		logger.info("copy <== \"%s\"", srcFile.getAbsolutePath());
+		logger.info("copy ==> \"%s\"", dstFile.getAbsolutePath());
+		assertTrue("file does not exists " + srcFile.getAbsolutePath(), srcFile.exists());
+
+		try (
+				FileInputStream fis = new FileInputStream(srcFile);
+				FileOutputStream fos = new FileOutputStream(dstFile)) {
+			FileChannel isChannel = fis.getChannel();
+			FileChannel osChannel = fos.getChannel();
+
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			while (isChannel.read(buffer) > 0) {
+				buffer.flip();
+				osChannel.write(buffer);
+				buffer.clear();
+			}
+
+			isChannel.close();
+			osChannel.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		logger.info("复制完成！ [%sbyte] => [%sbyte]", srcFile.length(), dstFile.length());
+		assertEquals(srcFile.length(), dstFile.length());
 	}
 }
