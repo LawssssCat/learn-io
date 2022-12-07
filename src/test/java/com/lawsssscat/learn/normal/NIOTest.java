@@ -1,7 +1,16 @@
 package com.lawsssscat.learn.normal;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.junit.Test;
 
@@ -12,7 +21,7 @@ public class NIOTest {
 	private static final Logger logger = Logger.get(NIOTest.class);
 
 	@Test
-	public void test01() {
+	public void testBuffer() {
 		// 容量1024byte
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
 		logger.info("buffer: %s [hash=%s]", buffer, buffer.hashCode());
@@ -75,4 +84,46 @@ public class NIOTest {
 		logger.info("flip: %s [hash=%s(%s)]", flip, flip.hashCode(), flip == buffer);
 	}
 
+	private String projectPath = System.getProperty("user.dir");
+
+	private File channelWriteFile = new File(projectPath + "/target/channelWriteTest.txt");
+
+	/**
+	 * Channel读/写数据
+	 */
+	@Test
+	public void testChannel() {
+		String except = String.format("hello world! %s", new SimpleDateFormat("YYYY-MM-DD hh:mm:ss").format(new Date()));
+		// 写
+		try (// 直接输出流通向目标文件
+				FileOutputStream fos = new FileOutputStream(channelWriteFile)) {
+			// 得到直接输出流对应的Channel
+			FileChannel channel = fos.getChannel();
+			// 分配缓冲区
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			buffer.put(except.getBytes());
+			buffer.flip();
+			// 写出数据
+			channel.write(buffer);
+			channel.close();
+			logger.info("写出完成! %s", channelWriteFile.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		String actual = null;
+		try (// 读
+				FileInputStream fis = new FileInputStream(channelWriteFile)) {
+			FileChannel channel = fis.getChannel();
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			channel.read(buffer);
+			buffer.flip();
+			actual = new String(buffer.array(), 0, buffer.remaining());
+			logger.info("读出： \"%s\"", actual);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		assertEquals(except, actual);
+	}
 }
