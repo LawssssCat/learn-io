@@ -9,13 +9,13 @@ import java.util.UUID;
 
 import com.lawsssscat.learn.Callback;
 
-public class BIOFileServerHanderRunnable implements Runnable {
+public class BIOFileServerHandlerRunnable implements Runnable {
 
 	private Socket socket;
 	private Callback callback;
 	private String basePath;
 
-	public BIOFileServerHanderRunnable(Socket socket, String basePath, Callback callback) {
+	public BIOFileServerHandlerRunnable(Socket socket, String basePath, Callback callback) {
 		this.socket = socket;
 		this.callback = callback;
 		this.basePath = basePath;

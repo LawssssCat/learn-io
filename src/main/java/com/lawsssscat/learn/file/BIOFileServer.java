@@ -6,6 +6,15 @@ import java.net.Socket;
 
 import com.lawsssscat.learn.Callback;
 
+/**
+ *
+ * 服务端接收任意类型数据，并保存
+ *
+ * 短连接
+ *
+ * @author lawsssscat
+ *
+ */
 public class BIOFileServer {
 
 	private int port;
@@ -27,7 +36,7 @@ public class BIOFileServer {
 						System.out.println("[server] waiting...");
 						Socket socket = serverSocket.accept();
 						System.out.println("[server] accept!");
-						new Thread(new BIOFileServerHanderRunnable(socket, basePath, callback)).start();
+						new Thread(new BIOFileServerHandlerRunnable(socket, basePath, callback)).start();
 						System.out.println("[server] deploy");
 					} catch (Throwable e) {
 						e.printStackTrace();

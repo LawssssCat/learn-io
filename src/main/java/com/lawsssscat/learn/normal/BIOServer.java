@@ -10,6 +10,8 @@ import com.lawsssscat.learn.Callback;
  *
  * 客户端发送消息，服务端接收消息
  *
+ * 短连接
+ *
  * @author lawsssscat
  *
  */
