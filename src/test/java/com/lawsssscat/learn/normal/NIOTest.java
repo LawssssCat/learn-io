@@ -166,4 +166,34 @@ public class NIOTest {
 		logger.info("复制完成！ [%sbyte] => [%sbyte]", srcFile.length(), dstFile.length());
 		assertEquals(srcFile.length(), dstFile.length());
 	}
+
+	/**
+	 * Channel复制数据 - 通过transfer方法
+	 */
+	@Test
+	public void testChannelCopyByTransfer() {
+		File srcFile = new File(projectPath + "/src/test/java/" + NIOTest.class.getName().replaceAll("\\.", "/") + ".java");
+		File dstFile = new File(projectPath + "/target/channelCopyTestByTransform-" + UUID.randomUUID().toString() + ".java");
+
+		logger.info("copy <== \"%s\"", srcFile.getAbsolutePath());
+		logger.info("copy ==> \"%s\"", dstFile.getAbsolutePath());
+		assertTrue("file does not exists " + srcFile.getAbsolutePath(), srcFile.exists());
+
+		try (FileInputStream fis = new FileInputStream(srcFile); FileOutputStream fos = new FileOutputStream(dstFile)) {
+			FileChannel isChannel = fis.getChannel();
+			FileChannel osChannel = fos.getChannel();
+
+			// 两种方法，功能一样
+			// osChannel.transferFrom(isChannel, isChannel.position(), isChannel.size());
+			isChannel.transferTo(isChannel.position(), isChannel.size(), osChannel);
+
+			isChannel.close();
+			osChannel.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		logger.info("复制完成！ [%sbyte] => [%sbyte]", srcFile.length(), dstFile.length());
+		assertEquals(srcFile.length(), dstFile.length());
+	}
 }
