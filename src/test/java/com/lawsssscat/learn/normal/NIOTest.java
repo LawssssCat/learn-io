@@ -196,4 +196,40 @@ public class NIOTest {
 		logger.info("复制完成！ [%sbyte] => [%sbyte]", srcFile.length(), dstFile.length());
 		assertEquals(srcFile.length(), dstFile.length());
 	}
+
+	/**
+	 * 测试客户端、服务端通信
+	 *
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void testSelector() throws IOException, InterruptedException {
+		int port = 7798;
+
+		// server
+		NIOServer server = new NIOServer(port);
+		server.startDaemon();
+
+		// client
+		int num = 3;
+		for (int i = 0; i < num; i++) {
+			Thread thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					NIOClient client = new NIOClient("127.0.0.1", port);
+					try {
+						client.login();
+						client.send("Hello world! I am " + Thread.currentThread());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			thread.setName("thread-client[" + i + "]");
+			thread.start();
+		}
+
+		Thread.sleep(1000);
+	}
 }

@@ -9,8 +9,6 @@ import java.net.Socket;
 import org.junit.Test;
 
 import com.lawsssscat.learn.Callback;
-import com.lawsssscat.learn.normal.BIOClient;
-import com.lawsssscat.learn.normal.BIOServer;
 
 public class BIOTest {
 
