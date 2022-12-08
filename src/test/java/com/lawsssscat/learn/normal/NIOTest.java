@@ -89,6 +89,12 @@ public class NIOTest {
 		logger.info("flip: %s [hash=%s(%s)]", flip, flip.hashCode(), flip == buffer);
 	}
 
+	@Test
+	public void testBuffer02() {
+		ByteBuffer wrap = ByteBuffer.wrap("hello world!".getBytes());
+		logger.info("wrap: %s [hash=%s]", wrap, wrap.hashCode());
+	}
+
 	private String projectPath = System.getProperty("user.dir");
 
 	private File channelWriteFile = new File(projectPath + "/target/channelWriteTest.txt");
