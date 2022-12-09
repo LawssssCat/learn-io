@@ -25,8 +25,10 @@ public class BIOChatServer {
 		this.port = port;
 	}
 
+	private ServerSocket serverSocket;
+
 	public void start() throws IOException {
-		ServerSocket serverSocket = new ServerSocket(port);
+		serverSocket = new ServerSocket(port);
 		BIOServerHandlerThreadPool threadPool = new BIOServerHandlerThreadPool(3, 6);
 		logger.info("start...");
 		Thread thread = new Thread(new Runnable() {
@@ -36,7 +38,7 @@ public class BIOChatServer {
 				while (true) {
 					count++;
 					try {
-						logger.info("waiting...");
+						logger.info("waiting...%s" + count);
 						Socket socket = serverSocket.accept();
 						logger.info("accept!");
 						threadPool.execute(new BIOChatServerHandlerRunnable(socket));

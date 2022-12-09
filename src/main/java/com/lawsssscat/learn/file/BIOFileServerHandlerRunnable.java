@@ -57,7 +57,7 @@ public class BIOFileServerHandlerRunnable implements Runnable {
 					size += len;
 				}
 
-				System.out.println(String.format("[server] [%sbyte] %s => %s", size, filename, outputFilename));
+				callback.run(size, filename, outputFilename);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

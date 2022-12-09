@@ -17,8 +17,10 @@ import com.lawsssscat.learn.Callback;
  */
 public class BIOServer {
 
+	private ServerSocket serverSocket;
+
 	public void start(int port, Callback callback) throws IOException {
-		ServerSocket serverSocket = new ServerSocket(port);
+		serverSocket = new ServerSocket(port);
 		System.out.println("===服务端启动===");
 		Thread thread = new Thread(new Runnable() {
 			@Override
