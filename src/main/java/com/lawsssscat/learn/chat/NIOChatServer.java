@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
+import com.lawsssscat.learn.utils.ByteBufferReadHelper;
 import com.lawsssscat.learn.utils.Logger;
 
 public class NIOChatServer {
@@ -107,21 +108,7 @@ public class NIOChatServer {
 	 */
 	private void handleClientMsg(SocketChannel channel) throws IOException {
 		// 接收数据
-		ByteBuffer buffer = ByteBuffer.allocate(4);
-		StringBuilder sb = new StringBuilder();
-		int len = 0;
-		while ((len = channel.read(buffer)) > 0) {
-			logger.info("buffer： %s [%s]", buffer, sb.length());
-			buffer.flip();
-			sb.append(new String(buffer.array(), 0, buffer.remaining()));
-			buffer.clear();
-		}
-		if (len < 0) {
-			logger.info("客户端关闭通道！ %s", channel);
-			channel.close();
-			return;
-		}
-		String msg = sb.toString();
+		String msg = ByteBufferReadHelper.read(channel);
 
 		// 处理数据
 		logger.info("接收通道（%s）信息： \"%s\"", channel, msg);
