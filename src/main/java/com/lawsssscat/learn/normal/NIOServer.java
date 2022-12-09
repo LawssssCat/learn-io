@@ -3,7 +3,6 @@ package com.lawsssscat.learn.normal;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -60,27 +59,45 @@ public class NIOServer {
 			Iterator<SelectionKey> it = selector.selectedKeys().iterator();
 			while (it.hasNext()) {
 				SelectionKey key = it.next();
-				if (key.isAcceptable()) {
-					// 接收就绪
-					SocketChannel channel = serverChannel.accept(); // ⚠️ accept 接入当前客户端通道
-					channel.configureBlocking(false); // ⚠️ 切换非阻塞模式
-					// 将通道注册到选择器上 💡 这里绑定“读事件”
-					channel.register(selector, SelectionKey.OP_READ);
-				} else if(key.isReadable()) {
-					// 读就绪
-					ReadableByteChannel channel = (ReadableByteChannel) key.channel(); // ⚠️ 通过选择器选择结果，反向获取客户端通道
-					// 读数据
-					StringBuilder sb = new StringBuilder();
-					ByteBuffer buffer = ByteBuffer.allocate(4);
-					while (channel.read(buffer) > 0) {
-						buffer.flip();
-						String msg = new String(buffer.array(), 0, buffer.remaining());
-						sb.append(msg);
-						buffer.clear();
-					}
-					logger.info(sb.toString());
-				}
 				it.remove(); // ⚠️ 需要移除事件，否则一直存在
+				SocketChannel channel = null;
+				try {
+					if (key.isAcceptable()) {
+						// 接收就绪
+						channel = serverChannel.accept(); // ⚠️ accept 接入当前客户端通道
+						channel.configureBlocking(false); // ⚠️ 切换非阻塞模式
+						// 将通道注册到选择器上 💡 这里绑定“读事件”
+						channel.register(selector, SelectionKey.OP_READ);
+					} else if (key.isReadable()) {
+						// 读就绪
+						channel = (SocketChannel) key.channel(); // ⚠️ 通过选择器选择结果，反向获取客户端通道
+						// 读数据
+						StringBuilder sb = new StringBuilder();
+						ByteBuffer buffer = ByteBuffer.allocate(4);
+						while (true) {
+							int len = channel.read(buffer);
+							if (len > 0) {
+								buffer.flip();
+								String msg = new String(buffer.array(), 0, buffer.remaining());
+								sb.append(msg);
+								buffer.clear();
+							} else {
+								if (len < 0) {
+									logger.info("客户端关闭通道");
+									channel.close();
+								}
+								break;
+							}
+						}
+						logger.info(sb.toString());
+					}
+				} catch (Throwable e) {
+					e.printStackTrace();
+					logger.info("通道异常断开");
+					if (channel != null) {
+						channel.close();
+					}
+				}
 			}
 		}
 	}
