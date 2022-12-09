@@ -7,6 +7,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 
 import com.lawsssscat.learn.utils.Logger;
@@ -128,7 +130,9 @@ public class NIOChatServer {
 				SocketChannel socketChannel = (SocketChannel) key.channel();
 				if (socketChannel.equals(channel)) {
 					logger.info("回复欢迎词 [%s => %s]", serverChannel.getLocalAddress(), socketChannel.getRemoteAddress());
-					socketChannel.write(ByteBuffer.wrap("欢迎登录！".getBytes()));
+					socketChannel.write(
+							ByteBuffer.wrap(
+									String.format("⭐️欢迎登录！🎉🎉🎉登录时间：%s~~~===🚀🚀🚀🚀😀", new SimpleDateFormat("YYYY年MM月DD日 hh时mm分ss秒SSS").format(new Date())).getBytes()));
 				} else {
 					logger.info("广播消息 [%s => %s] \"%s\"", channel.getRemoteAddress(), socketChannel.getRemoteAddress(), msg);
 					String broadcastMsg = String.format("%s: %s", socketChannel.getRemoteAddress(), msg);

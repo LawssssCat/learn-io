@@ -2,9 +2,13 @@ package com.lawsssscat.learn.chat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
@@ -83,14 +87,31 @@ public class NIOChatClientListener {
 			key.interestOps(key.interestOps() | SelectionKey.OP_READ);
 		} else if (key.isReadable()) {
 			logger.info("active for read");
+
+			Charset charset = StandardCharsets.UTF_8;
+			CharsetDecoder decoder = charset.newDecoder(); // 线程不安全
+
 			// read msg
-			ByteBuffer buffer = ByteBuffer.allocate(4);
+			int bufferSize = 10; // 大于8（2022年utf8最长大概8字节了，但规则好像是无限长度的）
+			ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
+			CharBuffer charBuffer = CharBuffer.allocate(bufferSize);
 			StringBuilder sb = new StringBuilder();
 			int len = 0;
-			while ((len = channel.read(buffer)) > 0) {
-				buffer.flip();
-				sb.append(new String(buffer.array(), 0, buffer.remaining()));
-				buffer.clear();
+			while ((len = channel.read(byteBuffer)) >= 0) {
+				byteBuffer.flip();
+				if (len > 0) {
+					decoder.decode(byteBuffer, charBuffer, false);
+				} else {
+					decoder.decode(byteBuffer, charBuffer, true);
+				}
+				charBuffer.flip();
+				logger.info("append: %s %s", byteBuffer, charBuffer);
+				sb.append(charBuffer);
+				charBuffer.clear();
+				byteBuffer.compact(); // ⚠️是compact
+				if (len == 0) {
+					break;
+				}
 			}
 			if (len < 0) {
 				key.cancel();
