@@ -6,11 +6,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import com.lawsssscat.learn.utils.Logger;
-
 public class BIOChatTest {
-
-	private static final Logger logger = Logger.get(BIOChatTest.class);
 
 	private Random random = new Random(new Date().getTime());
 

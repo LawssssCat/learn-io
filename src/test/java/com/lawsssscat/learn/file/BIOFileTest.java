@@ -5,8 +5,11 @@ import java.io.IOException;
 import org.junit.Test;
 
 import com.lawsssscat.learn.Callback;
+import com.lawsssscat.learn.utils.Logger;
 
 public class BIOFileTest {
+
+	private static final Logger logger = Logger.get(BIOFileClient.class);
 
 	String projectPath = System.getProperty("user.dir");
 
@@ -23,7 +26,7 @@ public class BIOFileTest {
 		server.start(new Callback() {
 			@Override
 			public void run(Object... args) {
-				System.out.println("[server] [%s]");
+				logger.info("[server] [%sbyte] %s => %s", args);
 			}
 		});
 		// client
