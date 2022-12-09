@@ -74,7 +74,7 @@ public class NIOChatServer {
 	private void serviceSelectionKey(SelectionKey key) throws IOException {
 		try {
 			if (key.isAcceptable()) {
-				// 客户端接入请求
+				// 客户端接入请求（服务端专属事件）
 				SocketChannel channel = serverChannel.accept(); // 三次握手，创建连接（connect）
 				logger.info("accept: %s", channel);
 				channel.configureBlocking(false);

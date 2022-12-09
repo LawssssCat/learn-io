@@ -20,13 +20,18 @@ public class NIOChatClient {
 	}
 
 	private SocketChannel channel;
+	private NIOChatClientListener listener;
 
 	public void login() throws IOException {
 		logger.info("init ... %s:%s", host, port);
+		// 建立连接
 		channel = SocketChannel.open(); // 底层socket
-		channel.connect(new InetSocketAddress(host, port)); // 三次握手
-		channel.configureBlocking(false); // 后续传输过程无须阻塞等待
+		channel.configureBlocking(false); // ⚠️注意，这里需要在connect之前设置，否则就是阻塞connect了（不走selector的方法）
+		channel.connect(new InetSocketAddress(host, port)); // tcp三次握手
 		logger.info("connect! %s", getChannelInfo(channel));
+		// 客户端监听服务端消息
+		listener = new NIOChatClientListener(channel);
+		listener.start();
 	}
 
 	public void send(String msg) throws IOException {
@@ -37,6 +42,7 @@ public class NIOChatClient {
 
 	public void logout() throws IOException {
 		channel.close();
+		listener.close();
 		logger.info("logout %s %s", channel, getChannelInfo(channel));
 	}
 
