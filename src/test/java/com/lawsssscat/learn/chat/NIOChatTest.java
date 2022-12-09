@@ -44,10 +44,8 @@ public class NIOChatTest {
 						Thread.sleep(500 + random.nextInt(500));
 						client.send("hello world! my name is " + Thread.currentThread().getName());
 						Thread.sleep(500 + random.nextInt(500));
-//						client.logout();
-						// 新连接
-						client.login();
 						client.send("[new]hello world! my name is " + Thread.currentThread().getName());
+						Thread.sleep(500 + random.nextInt(500));
 						client.logout();
 					} catch (IOException | InterruptedException e) {
 						e.printStackTrace();

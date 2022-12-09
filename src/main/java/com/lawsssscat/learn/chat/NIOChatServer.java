@@ -3,7 +3,6 @@ package com.lawsssscat.learn.chat;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -57,7 +56,7 @@ public class NIOChatServer {
 					SelectionKey key = it.next();
 					it.remove();
 					logger.info("server handle selectionKey %s", key);
-					handleSelectionKey(key);
+					serviceSelectionKey(key);
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -72,17 +71,16 @@ public class NIOChatServer {
 	 * @param key
 	 * @throws IOException
 	 */
-	private void handleSelectionKey(SelectionKey key) throws IOException {
-		SocketChannel channel = null;
+	private void serviceSelectionKey(SelectionKey key) throws IOException {
 		try {
 			if (key.isAcceptable()) {
 				// 客户端接入请求
-				channel = serverChannel.accept(); // 三次握手，创建连接（connect）
+				SocketChannel channel = serverChannel.accept(); // 三次握手，创建连接（connect）
 				logger.info("accept: %s", channel);
 				channel.configureBlocking(false);
 				channel.register(selector, SelectionKey.OP_READ);
 			} else if (key.isReadable()) {
-				channel = (SocketChannel) key.channel();
+				SocketChannel channel = (SocketChannel) key.channel();
 				logger.info("read: %s", channel);
 				// 客户端数据
 				handleClientMsg(channel);
@@ -91,9 +89,9 @@ public class NIOChatServer {
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
-			if (channel != null) {
-				logger.info("通道异常，需要断开！");
-				channel.close();
+			if (key.channel() != null) {
+				logger.info("通道异常，需要断开！ %s", key.channel());
+				key.channel().close();
 			}
 		}
 	}
@@ -105,27 +103,39 @@ public class NIOChatServer {
 	 * @param channel
 	 * @throws IOException
 	 */
-	private void handleClientMsg(ReadableByteChannel channel) throws IOException {
+	private void handleClientMsg(SocketChannel channel) throws IOException {
+		// 接收数据
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		StringBuilder sb = new StringBuilder();
 		int len = 0;
-		while (true) {
-			len = channel.read(buffer);
+		while ((len = channel.read(buffer)) > 0) {
 			logger.info("buffer： %s [%s]", buffer, sb.length());
-			if (len > 0) {
-				buffer.flip();
-				sb.append(new String(buffer.array(), 0, buffer.remaining()));
-				buffer.clear();
-			} else {
-				if (len < 0) {
-					logger.info("客户端关闭通道！");
-					channel.close();
+			buffer.flip();
+			sb.append(new String(buffer.array(), 0, buffer.remaining()));
+			buffer.clear();
+		}
+		if (len < 0) {
+			logger.info("客户端关闭通道！ %s", channel);
+			channel.close();
+			return;
+		}
+		String msg = sb.toString();
+
+		// 处理数据
+		logger.info("接收通道（%s）信息： \"%s\"", channel, msg);
+		for (SelectionKey key : selector.keys()) { // 广播
+			if (key.channel() instanceof SocketChannel) {
+				SocketChannel socketChannel = (SocketChannel) key.channel();
+				if (socketChannel.equals(channel)) {
+					logger.info("回复欢迎词 [%s => %s]", serverChannel.getLocalAddress(), socketChannel.getRemoteAddress());
+					socketChannel.write(ByteBuffer.wrap("欢迎登录！".getBytes()));
+				} else {
+					logger.info("广播消息 [%s => %s] \"%s\"", channel.getRemoteAddress(), socketChannel.getRemoteAddress(), msg);
+					String broadcastMsg = String.format("%s: %s", socketChannel.getRemoteAddress(), msg);
+					socketChannel.write(ByteBuffer.wrap(broadcastMsg.getBytes()));
 				}
-				break;
 			}
 		}
-
-		logger.info("接收通道（%s）信息： %s", channel, sb.toString());
 	}
 
 }

@@ -91,8 +91,21 @@ public class NIOTest {
 
 	@Test
 	public void testBuffer02() {
+		// wrap
 		ByteBuffer wrap = ByteBuffer.wrap("hello world!".getBytes());
 		logger.info("wrap: %s [hash=%s]", wrap, wrap.hashCode());
+		// compact
+		byte[] bytes = new byte[3];
+		ByteBuffer get = wrap.get(bytes);
+		logger.info(new String(bytes));
+		logger.info("get: %s [hash=%s]", get, get.hashCode());
+		Buffer limit = get.limit(10);
+		logger.info("limit: %s [hash=%s]", limit, limit.hashCode());
+		ByteBuffer compact = wrap.compact();
+		logger.info("compact: %s [hash=%s]", compact, compact.hashCode());
+		ByteBuffer flip = (ByteBuffer) compact.flip();
+		logger.info(new String(flip.array(), 0, flip.remaining()));
+		logger.info("flip: %s [hash=%s]", flip, flip.hashCode());
 	}
 
 	private String projectPath = System.getProperty("user.dir");
